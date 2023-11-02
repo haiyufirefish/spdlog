@@ -54,16 +54,18 @@ SPDLOG_INLINE thread_pool::~thread_pool() {
     }
     SPDLOG_CATCH_STD
 }
-
+// add data into pool
 void SPDLOG_INLINE thread_pool::post_log(async_logger_ptr &&worker_ptr,
                                          const details::log_msg &msg,
                                          async_overflow_policy overflow_policy) {
-    async_msg async_m(std::move(worker_ptr), async_msg_type::log, msg);
+    async_msg async_m(std::move(worker_ptr), async_msg_type::log, msg); // change log_msg to async_msg
     post_async_msg_(std::move(async_m), overflow_policy);
 }
 
 void SPDLOG_INLINE thread_pool::post_flush(async_logger_ptr &&worker_ptr,
                                            async_overflow_policy overflow_policy) {
+    // Call post_flush to flush log messages. The implementation is to insert a message of type flush to the end of the queue.
+    // When the back-end thread recognizes this type of message, it will call the corresponding flush function to flush the cached data to the target file.
     post_async_msg_(async_msg(std::move(worker_ptr), async_msg_type::flush), overflow_policy);
 }
 
@@ -80,15 +82,16 @@ size_t SPDLOG_INLINE thread_pool::queue_size() { return q_.size(); }
 void SPDLOG_INLINE thread_pool::post_async_msg_(async_msg &&new_msg,
                                                 async_overflow_policy overflow_policy) {
     if (overflow_policy == async_overflow_policy::block) {
-        q_.enqueue(std::move(new_msg));
-    } else if (overflow_policy == async_overflow_policy::overrun_oldest) {
+        q_.enqueue(std::move(new_msg)); // block strategy
+    } else if (overflow_policy == async_overflow_policy::overrun_oldest) { // overrun oldest 
         q_.enqueue_nowait(std::move(new_msg));
-    } else {
+    } else {   
+        // discard the newest
         assert(overflow_policy == async_overflow_policy::discard_new);
         q_.enqueue_if_have_room(std::move(new_msg));
     }
 }
-
+// Sub-thread loop
 void SPDLOG_INLINE thread_pool::worker_loop_() {
     while (process_next_msg_()) {
     }
