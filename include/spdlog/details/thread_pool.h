@@ -71,7 +71,7 @@ class SPDLOG_API thread_pool {
 public:
     using item_type = async_msg;
     using q_type = details::mpmc_blocking_queue<item_type>;
-
+ // two function pointers as input, when start executes one, and end with another
     thread_pool(size_t q_max_items,
                 size_t threads_n,
                 std::function<void()> on_thread_start,
@@ -96,11 +96,13 @@ public:
     size_t queue_size();
 
 private:
+// circular queue
     q_type q_;
-
+// sub threds container
     std::vector<std::thread> threads_;
-
+// pop the async message
     void post_async_msg_(async_msg &&new_msg, async_overflow_policy overflow_policy);
+// working loop, sub threads loop
     void worker_loop_();
 
     // process next message in the queue
