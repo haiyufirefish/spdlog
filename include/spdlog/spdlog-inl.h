@@ -10,6 +10,12 @@
 #include <spdlog/common.h>
 #include <spdlog/pattern_formatter.h>
 
+
+//spdlog::thread_pool is not a general thread pool, but a dedicated thread pool specifically used to process asynchronous log messages. 
+// Use a ring queue to store asynchronous log messages, supporting both blocking and non-blocking methods for inserting data; for retrieving data, only blocking methods are supported.
+
+// thread pool parameter is shared_ptr&&, it doesnt's add count
+// avoid circular reference
 namespace spdlog {
 
 SPDLOG_INLINE void initialize_logger(std::shared_ptr<logger> logger) {
