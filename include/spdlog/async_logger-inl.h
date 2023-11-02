@@ -54,7 +54,7 @@ else {
 SPDLOG_LOGGER_CATCH(source_loc())
 }
 
-//
+// backend thead accept log message, execute is this function
 // backend functions - called from the thread pool to do the actual job
 //
 SPDLOG_INLINE void spdlog::async_logger::backend_sink_it_(const details::log_msg &msg) {
