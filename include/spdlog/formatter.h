@@ -7,7 +7,8 @@
 #include <spdlog/fmt/fmt.h>
 
 namespace spdlog {
-
+// logger object nimmt message an. 
+// this formatter owned by each sink, transform the message to string. pattern is used for expected format
 class formatter {
 public:
     virtual ~formatter() = default;
